@@ -1,15 +1,15 @@
 import React, { Component } from "react";
-import { inject, observer } from "mobx-react";
+import { inject, observer, useObserver, useLocalStore } from "mobx-react";
 import { compose } from "recompose";
 
 import { withFirebase } from "./Firebase";
-import { autobind } from "core-decorators";
+import RenderCounter from "react-render-counter";
 
 // import MessageList from "./MessageList";
 
 @inject("messageStore", "sessionStore")
 @observer
-@autobind
+// @autobind
 class Messages extends Component {
   constructor(props) {
     super(props);
@@ -42,7 +42,14 @@ class Messages extends Component {
   };
 
   componentWillUnmount() {
+    const { messages } = this.props.messageStore;
+    console.log(messages);
     // this.props.firebase.getFirestore().collection("messages").off();
+  }
+
+  componentDidUpdate() {
+    const { messages } = this.props.messageStore;
+    console.log(messages);
   }
 
   onNextPage = () => {
@@ -58,6 +65,7 @@ class Messages extends Component {
   onCreateMessage(e) {
     e.preventDefault();
     this.props.messageStore.add(this.state.text);
+    this.setState({ text: "" });
     // .then(this.props.messageStore.findAll({ page: 0 }));
   }
 
@@ -67,7 +75,7 @@ class Messages extends Component {
 
   render() {
     const { messages } = this.props.messageStore;
-    console.log(this.props);
+    // console.log(this.props);
     const { text, loading } = this.state;
     // const messages = messageStore.messageList;
 
@@ -98,22 +106,22 @@ class Messages extends Component {
   }
 }
 
-const MessageList = ({ messages }) => (
-  <ul>
-    {messages.map((message) => (
-      <MessageItem key={message.id} message={message} />
-    ))}
-  </ul>
-);
+const MessageList = ({ messages }) => {
+  return useObserver(() => (
+    <ul>
+      {messages.map((message) => (
+        <MessageItem key={message.id} message={message} />
+      ))}
+    </ul>
+  ));
+};
 
-const MessageItem = ({ message }) => (
-  <li>
-    <strong>{message.id}</strong> {message.data.message}
-  </li>
-);
+const MessageItem = ({ message }) => {
+  return useObserver(() => (
+    <li>
+      <strong>{message.id}</strong> {message.data.message}
+    </li>
+  ));
+};
 
-export default compose(
-  withFirebase,
-  inject("messageStore", "sessionStore"),
-  observer
-)(Messages);
+export default compose(withFirebase)(Messages);

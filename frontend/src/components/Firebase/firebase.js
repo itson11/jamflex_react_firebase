@@ -54,6 +54,8 @@ class Firebase {
       displayName: profile.name,
       photoURL: profile.picture,
     });
+    console.log(profile);
+    await this.getFirestore().collection("users").doc(profile.sub).set(profile);
   }
 
   async signOut() {

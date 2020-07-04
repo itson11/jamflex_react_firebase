@@ -19,17 +19,28 @@ import AddRoleSchool from "../role/addRoleSchool";
 import "../App.css";
 import "../App.sass";
 
+import { useAuth0 } from "@auth0/auth0-react";
+
 const Navbar = (props) => {
+  const {
+    isLoading,
+    isAuthenticated,
+    error,
+    user,
+    loginWithRedirect,
+    logout,
+    getIdTokenClaims,
+  } = useAuth0();
+
   const [active, setActive] = useState(false);
-  const [user, setUser] = useState(props.user);
 
   const handleClick = () => {
     setActive(!active);
   };
 
-  useEffect(() => {
-    setUser(props.user);
-  }, [props.user]);
+  // useEffect(() => {
+  //   setUser(props.user);
+  // }, [props.user]);
 
   return (
     <div className="container">
@@ -87,16 +98,16 @@ const Navbar = (props) => {
               <div className="navbar-item">
                 <div className="field is-grouped is-grouped-multiline">
                   <p className="control">
-                    {props.logged_in && props.user && (
+                    {isAuthenticated && (
                       <Link className="button is-warning" to="/addrole">
                         <span className="has-margin-right-2 has-text-weight-bold">
-                          {props.user.fullname}
+                          {user.name}
                         </span>
                       </Link>
                     )}
                   </p>
                   <p className="control">
-                    {props.logged_in && (
+                    {isAuthenticated && (
                       <Link className="button is-primary" to="/addrole">
                         <strong>추가</strong>
                         <span className="icon">
@@ -117,15 +128,18 @@ const Navbar = (props) => {
                     )} */}
                   </p>
                   <p className="control">
-                    {/* {props.logged_in ? 
-                        <Link className="button is-light" to="#" onClick={ e => props.handle_logout()}>
-                          <strong>로그아웃</strong>
-                        </Link>
-                        :
-                        <Link className="button is-light" to="/login">
-                          <strong>로그인</strong>
-                        </Link>
-                      }  */}
+                    {isAuthenticated ? (
+                      <button className="button" onClick={() => logout()}>
+                        로그아웃
+                      </button>
+                    ) : (
+                      <button
+                        className="button"
+                        onClick={() => loginWithRedirect()}
+                      >
+                        <strong>로그인</strong>
+                      </button>
+                    )}
                   </p>
                 </div>
               </div>

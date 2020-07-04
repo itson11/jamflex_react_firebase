@@ -1,30 +1,30 @@
 import { observable, action, computed } from "mobx";
 import Firebase from "../components/Firebase/firebase";
 
-class UserStore {
+class SchoolStore {
   @observable
-  users = null;
-  collectionName = "users";
+  schools = null;
+  collectionName = "schools";
 
   constructor(rootStore) {
     this.rootStore = rootStore;
   }
 
-  @action setUsers = (users) => {
-    this.users = users;
+  @action setSchools = (schools) => {
+    this.schools = schools;
   };
 
-  @action setUser = (user, uid) => {
-    if (!this.users) {
-      this.users = {};
+  @action setSchool = (user, uid) => {
+    if (!this.schools) {
+      this.schools = {};
     }
 
-    this.users[uid] = user;
+    this.schools[uid] = user;
   };
 
   @action create = (user) => {
-    if (!this.users) {
-      this.users = {};
+    if (!this.schools) {
+      this.schools = {};
     }
 
     Firebase.getFirestore()
@@ -34,11 +34,11 @@ class UserStore {
   };
 
   @computed get userList() {
-    return Object.keys(this.users || {}).map((key) => ({
-      ...this.users[key],
+    return Object.keys(this.schools || {}).map((key) => ({
+      ...this.schools[key],
       uid: key,
     }));
   }
 }
 
-export default UserStore;
+export default SchoolStore;

@@ -1,4 +1,4 @@
-import { observable, action, computed } from "mobx";
+import { observable, action, computed, autorun } from "mobx";
 import { autobind } from "core-decorators";
 import MessageRepository from "../repositories/messageRepository";
 import MessageModel from "../models/messageModel";
@@ -14,6 +14,7 @@ export default class MessageStore {
 
   constructor(rootStore) {
     this.rootStore = rootStore;
+    autorun(() => console.log(this.messages));
   }
 
   @action
@@ -23,13 +24,38 @@ export default class MessageStore {
       .collection(this.collectionName)
       .orderBy("createdAt", "desc")
       .limit(this.limit)
-      .onSnapshot((snapshot) => {
+      .get()
+      .then((snapshot) => {
         const docs = snapshot.docs.map((docSnapshot) => ({
           id: docSnapshot.id,
           data: docSnapshot.data(),
         }));
         this.messages = docs.map((doc) => new MessageModel(doc));
+      })
+      .catch(function (error) {
+        console.error("Error getting document:", error);
       });
+
+    // .onSnapshot((snapshot) => {
+    //   const docs = snapshot.docs.map((docSnapshot) => ({
+    //     id: docSnapshot.id,
+    //     data: docSnapshot.data(),
+    //   }));
+    //   this.messages = docs.map((doc) => new MessageModel(doc));
+    // });
+
+    /*
+    var unsubscribe = db.collection("cities")
+    .onSnapshot(function (){
+      // Respond to data
+      // ...
+    });
+
+    // Later ...
+
+    // Stop listening to changes
+    unsubscribe();
+    */
   }
 
   @action
@@ -42,12 +68,26 @@ export default class MessageStore {
       createdAt,
       message,
     };
-    const docRef = Firebase.getFirestore()
-      .collection(this.collectionName)
-      .add(newMessage);
 
-    console.log(docRef);
-    this.messages.push(new MessageModel({ id: docRef.id, data: newMessage }));
+    await Firebase.getFirestore()
+      .collection(this.collectionName)
+      .add(newMessage)
+      .then((docRef) => {
+        console.log(docRef.id);
+
+        this.messages.unshift(
+          new MessageModel({ id: docRef.id, data: newMessage })
+        );
+        // this.messages = {
+        //   ...this.messages,
+        //   ...new MessageModel({ id: docRef.id, data: newMessage }),
+        // };
+        // return this.messages;
+        console.log(this.messages);
+      })
+      .catch(function (error) {
+        console.error("Error getting document:", error);
+      });
   }
 
   @action
@@ -65,9 +105,12 @@ export default class MessageStore {
   };
 
   // @computed get messages() {
-  //   return Object.keys(this.messages || {}).map((key) => ({
+  //   const val = Object.keys(this.messages || {}).map((key) => ({
   //     ...this.messages[key],
-  //     uid: key,
+  //     id: key,
   //   }));
+
+  //   console.log(val);
+  //   // return val;
   // }
 }

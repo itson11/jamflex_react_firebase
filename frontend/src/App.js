@@ -9,11 +9,11 @@ import Navbar from "./ui/Navbar";
 import { withFirebase } from "./components/Firebase";
 import Messages from "./components/messages";
 
-// import { observer, inject } from "mobx";
+import useStores from "./utils/useStores";
 
-// @inject("sessionStore")
-// @observer
 function App(props) {
+  const { sessionStore } = useStores();
+
   const {
     isLoading,
     isAuthenticated,
@@ -44,9 +44,8 @@ function App(props) {
           props.firebase
             .setToken(response.data.firebaseToken)
             .then(function () {
-              props.firebase.updateProfile(user);
-              console.debug("==============firebase user============");
-              console.debug(props.firebase.getCurrentUser());
+              props.firebase.updateProfile(user).then(function (data) {});
+              sessionStore.setAuthUser(props.firebase.getCurrentUser());
             });
         })
         .catch((error) => {
@@ -68,47 +67,18 @@ function App(props) {
     );
   }
 
-  if (isAuthenticated) {
-    return (
-      <div className="App">
-        <Navbar
-          // handle_login={this.handle_login}
-          // handle_logout={this.handle_logout}
-          // logged_in={this.state.logged_in}
-          user={user}
-        />
-        <Messages />
-
-        <footer className="footer has-background-white">
-          <div className="content has-text-centered">
-            <p>
-              <strong>JM</strong> by <a href="/">Jamanager</a>.
-            </p>
-          </div>
-        </footer>
-      </div>
-    );
-  } else {
-    return <button onClick={loginWithRedirect}>Log in</button>;
-  }
-
   return (
     <div className="App">
-      <header className="App-header">
-        <Profile />
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar />
+      <Messages />
+
+      <footer className="footer has-background-white">
+        <div className="content has-text-centered">
+          <p>
+            <strong>JM</strong> by <a href="/">Jamanager</a>.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
