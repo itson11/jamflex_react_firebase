@@ -55,4 +55,4 @@ class Auth0Client {
   }
 }
 
-export default auth0Client = new Auth0Client();
+export default new Auth0Client();

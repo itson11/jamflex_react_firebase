@@ -4,6 +4,9 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { Provider } from "mobx-react";
+import Firebase, { FirebaseContext } from "./components/Firebase";
+import store from "./stores";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -14,8 +17,14 @@ ReactDOM.render(
       redirectUri={window.location.origin}
       responseType="token id_token"
       scope="openid profile"
+      cacheLocation="localstorage"
+      useRefreshTokens="true"
     >
-      <App />
+      <Provider {...store}>
+        <FirebaseContext.Provider value={Firebase}>
+          <App />
+        </FirebaseContext.Provider>
+      </Provider>
     </Auth0Provider>
   </React.StrictMode>,
   document.getElementById("root")

@@ -2,11 +2,18 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { useAuth0 } from "@auth0/auth0-react";
-
 import Profile from "./auth0/Profile";
 import axios from "axios";
 
-function App() {
+import Navbar from "./ui/Navbar";
+import { withFirebase } from "./components/Firebase";
+import Messages from "./components/messages";
+
+// import { observer, inject } from "mobx";
+
+// @inject("sessionStore")
+// @observer
+function App(props) {
   const {
     isLoading,
     isAuthenticated,
@@ -17,7 +24,7 @@ function App() {
     getIdTokenClaims,
   } = useAuth0();
 
-  console.debug(user);
+  // console.debug(user);
   if (user) {
     (async () => {
       const claims = await getIdTokenClaims();
@@ -34,9 +41,18 @@ function App() {
         },
       })
         .then((response) => {
-          console.log(response.data.firebaseToken);
+          props.firebase
+            .setToken(response.data.firebaseToken)
+            .then(function () {
+              props.firebase.updateProfile(user);
+              console.debug("==============firebase user============");
+              console.debug(props.firebase.getCurrentUser());
+            });
         })
-        .catch((error) => console.error("timeout exceeded"));
+        .catch((error) => {
+          console.debug(error);
+          console.error("timeout exceeded");
+        });
     })();
   }
 
@@ -54,8 +70,22 @@ function App() {
 
   if (isAuthenticated) {
     return (
-      <div>
-        Hello {user.name} <button onClick={() => logout()}>Log out</button>
+      <div className="App">
+        <Navbar
+          // handle_login={this.handle_login}
+          // handle_logout={this.handle_logout}
+          // logged_in={this.state.logged_in}
+          user={user}
+        />
+        <Messages />
+
+        <footer className="footer has-background-white">
+          <div className="content has-text-centered">
+            <p>
+              <strong>JM</strong> by <a href="/">Jamanager</a>.
+            </p>
+          </div>
+        </footer>
       </div>
     );
   } else {
@@ -83,4 +113,4 @@ function App() {
   );
 }
 
-export default App;
+export default withFirebase(App);

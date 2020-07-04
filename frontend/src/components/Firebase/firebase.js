@@ -1,20 +1,37 @@
+import firebase from "firebase";
 let _messagesDb = null;
+
+const config = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+
+  // databaseURL: process.env.FIREBASE_APP_PROJECT_ID,
+  // storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+  // messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+};
 
 class Firebase {
   constructor() {
-    firebase.initializeApp({
-      apiKey: "AIzaSyBA4DEGxlO59laqA5vFp91oDZs5pffdAf4",
-      authDomain: "jamflex-1fe2e.firebaseapp.com",
-      projectId: "jamflex-1fe2e",
-    });
+    firebase.initializeApp(config);
+
+    this.auth = firebase.auth();
+
+    // firebase.initializeApp({
+    //   apiKey: process.env.FIREBASE_APP_API_KEY, //"AIzaSyBA4DEGxlO59laqA5vFp91oDZs5pffdAf4",
+    //   authDomain: process.env.FIREBASE_APP_AUTH_DOMAIN, //"jamflex-1fe2e.firebaseapp.com",
+    //   projectId: process.env.FIREBASE_APP_PROJECT_ID, //"jamflex-1fe2e",
+    // });
 
     // initialize Firestore through Firebase
     _messagesDb = firebase.firestore();
 
     // disable deprecated features
-    _messagesDb.settings({
-      timestampsInSnapshots: true,
-    });
+    // _messagesDb.settings({});
+  }
+
+  getFirestore() {
+    return firebase.firestore();
   }
 
   async addMessage(message) {
@@ -60,4 +77,5 @@ class Firebase {
   }
 }
 
-export default firebaseClient = new Firebase();
+// const firebaseClient = new Firebase();
+export default new Firebase();
