@@ -13,7 +13,7 @@ import {
 // import UserList from "../userList";
 // import SchoolListInMainMenu from "./schoolListInMainMenu";
 import AddRole from "../role/addRole";
-import AddRoleSchool from "../role/addRoleSchool";
+import { AddSchool, ListSchool, ViewSchool, EditSchool } from "../school";
 // import UploadFile from "../uploadFile";
 // import "./Navbar.css";
 import "../App.css";
@@ -108,8 +108,8 @@ const Navbar = (props) => {
                   </p>
                   <p className="control">
                     {isAuthenticated && (
-                      <Link className="button is-primary" to="/addrole">
-                        <strong>추가</strong>
+                      <Link className="button is-primary" to="/school/add">
+                        <strong>학교추가</strong>
                         <span className="icon">
                           <i className="fas fa-plus has-text-warning"></i>
                         </span>
@@ -169,18 +169,17 @@ const Navbar = (props) => {
                       <SchoolListInMainMenu {...props} user={user} />
                     )}
                   /> */}
-                  <Route
-                    path="/addrole"
-                    render={(props) => <AddRole {...props} user={user} />}
-                  />
-                  <Route
+                  <Route path="/school/add" render={(props) => <AddSchool />} />
+                  {/* <Route
                     path="/addroleschool"
                     render={(props) => <AddRoleSchool {...props} user={user} />}
-                  />
-                  {/* <Route
-                    path="/schools"
-                    render={(props) => <Schools {...props} user={user} />}
                   /> */}
+                  <Route
+                    path="/school/list"
+                    render={(props) => <ListSchool />}
+                  />
+                  <Route path="/school/view/:id" component={ViewSchool} />
+                  <Route path="/school/edit/:id" component={EditSchool} />
                   {/* <Route
                     path="/uploadFile"
                     render={(props) => <UploadFile {...props} user={user} />}

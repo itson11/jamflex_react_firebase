@@ -70,7 +70,7 @@ function App(props) {
   return (
     <div className="App">
       <Navbar />
-      <Messages />
+      {/* <Messages /> */}
 
       <footer className="footer has-background-white">
         <div className="content has-text-centered">
