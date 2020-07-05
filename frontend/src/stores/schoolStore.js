@@ -2,6 +2,7 @@ import { observable, action, computed } from "mobx";
 import { autobind } from "core-decorators";
 import Firebase from "../components/Firebase/firebase";
 import SchoolModel from "../models/schoolModel";
+import ChiefModel from "../models/chiefModel";
 
 @autobind
 class SchoolStore {
@@ -27,11 +28,79 @@ class SchoolStore {
       .collection(this.collectionName)
       .doc(id)
       .get();
-    this.school = {
+
+    this.school = new SchoolModel({
       id: schoolRef.id,
       data: schoolRef.data(),
-    };
+    });
+
+    const chiefsRef = await Firebase.getFirestore()
+      .collection(this.collectionName)
+      .doc(id)
+      .collection(this.collectionName4Chief)
+      .get();
+    let chiefs = {};
+    if (chiefsRef.docs.length > 0)
+      chiefs = chiefsRef.docs.map((chiefRef) => {
+        return new ChiefModel({
+          id: chiefRef.id,
+          data: chiefRef.data(),
+        });
+      });
+    this.school = { ...{ chiefs }, ...this.school };
+
+    const teachersRef = await Firebase.getFirestore()
+      .collection(this.collectionName)
+      .doc(id)
+      .collection(this.collectionName4Teacher)
+      .get();
+    let teachers = {};
+    if (teachersRef.docs.length > 0)
+      teachers = teachersRef.docs.map((teacherRef) => {
+        return new TeacherModel({
+          id: teacherRef.id,
+          data: teacherRef.data(),
+        });
+      });
+    this.school = { ...{ teachers }, ...this.school };
+
+    const studentsRef = await Firebase.getFirestore()
+      .collection(this.collectionName)
+      .doc(id)
+      .collection(this.collectionName4Student)
+      .get();
+    let students = {};
+    if (studentsRef.docs.length > 0)
+      students = studentsRef.docs.map((studentRef) => {
+        return new StudentModel({
+          id: studentRef.id,
+          data: studentRef.data(),
+        });
+      });
+    this.school = { ...{ students }, ...this.school };
+
+    const studiesRef = await Firebase.getFirestore()
+      .collection(this.collectionName)
+      .doc(id)
+      .collection(this.collectionName4Study)
+      .get();
+    let studies = {};
+    if (studiesRef.docs.length > 0)
+      studies = studiesRef.docs.map((studieRef) => {
+        return new StudyModel({
+          id: studieRef.id,
+          data: studieRef.data(),
+        });
+      });
+    this.school = { ...{ studies }, ...this.school };
+
+    // this.school = new SchoolModel({
+    //   id: schoolRef.id,
+    //   data: schoolRef.data(),
+    //   chiefs,
+    // });
   }
+
   @action
   async findAll(params) {
     // const data = await MessageRepository.findAll(params);
@@ -40,14 +109,14 @@ class SchoolStore {
       .orderBy("createdAt", "desc")
       .limit(this.limit)
       .get()
-      .then((snapshot) => {
-        const docs = snapshot.docs.map((docSnapshot) => {
-          return {
-            id: docSnapshot.id,
-            data: docSnapshot.data(),
-          };
+      .then((schoolsRef) => {
+        this.schools = schoolsRef.docs.map((schoolRef) => {
+          return new SchoolModel({
+            id: schoolRef.id,
+            data: schoolRef.data(),
+          });
         });
-        this.schools = docs.map((doc) => new SchoolModel(doc));
+        // this.schools = docs.map((doc) => new SchoolModel(doc));
       })
       .catch(function (error) {
         console.error("Error getting document:", error);
